@@ -115,6 +115,7 @@
   .x:hover{ color:var(--bad); }
   .stat{ font-size:12px; color:var(--ink-soft); line-height:1.6; }
   .stat b{ color:var(--ink); }
+  .stat .del{ color:var(--bad); font-weight:600; }
   .busy{ display:flex; align-items:center; gap:10px; font-size:12.5px; color:var(--ink-soft); }
   .spinner{ width:16px; height:16px; border:2px solid var(--line-strong); border-top-color:var(--accent); border-radius:50%; animation:spin .7s linear infinite; flex:none; }
   @keyframes spin{ to{ transform:rotate(360deg); } }
@@ -126,26 +127,49 @@
   .pill.warn{ background:var(--warn-soft); color:var(--warn); }
   .pill.bad{ background:var(--bad-soft); color:var(--bad); }
   .rowbtns{ display:flex; gap:6px; }
-  .mini{ flex:1; font-size:12px; font-weight:600; padding:7px 8px; border-radius:7px; border:1px solid var(--line-strong); background:var(--surface); color:var(--ink); cursor:pointer; }
-  .mini:disabled{ opacity:.5; cursor:default; }
+  .mini{ font-size:12px; font-weight:600; padding:7px 10px; border-radius:7px; border:1px solid var(--line-strong); background:var(--surface); color:var(--ink); cursor:pointer; }
+  .mini:disabled{ opacity:.45; cursor:default; }
+  .rowbtns .mini{ flex:1; }
   .mini.dl{ background:var(--accent); border-color:var(--accent); color:#fff; }
-  @media (prefers-color-scheme: dark){ .mini.dl{ color:#1a1405; } }
+  .mini.danger{ background:var(--bad); border-color:var(--bad); color:#fff; }
+  @media (prefers-color-scheme: dark){ .mini.dl, .mini.danger{ color:#1a1405; } }
 
-  /* 선별 사진 */
+  /* 검사란 사진 영역 */
   tr.detail td{ background:color-mix(in srgb, var(--paper) 65%, var(--surface)); padding:16px 18px 22px 52px; border-bottom:2px solid var(--line-strong); }
-  .how{ font-size:12.5px; color:var(--ink-soft); background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:10px 14px; line-height:1.55; }
-  .how b{ color:var(--ink); }
-  .lanes{ display:grid; grid-template-columns:repeat(auto-fill, minmax(250px, 1fr)); gap:14px; margin-top:14px; align-items:start; }
-  .lane{ background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:12px; }
-  .lane-head{ display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; padding-bottom:8px; border-bottom:1px solid var(--line); margin-bottom:10px; }
+  .seltools{ display:flex; justify-content:space-between; align-items:center; gap:10px 16px; flex-wrap:wrap;
+    background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:10px 14px; font-size:12.5px; color:var(--ink-soft); line-height:1.55; }
+  .seltools b{ color:var(--ink); }
+  .tool-btns{ display:flex; align-items:center; gap:8px; flex:none; }
+  .selinfo{ margin-right:4px; }
+  .trash{ margin-top:10px; border:1.5px dashed color-mix(in srgb, var(--bad) 40%, var(--line)); border-radius:10px; padding:10px 12px; background:var(--surface); }
+  .trash-head{ font-size:12.5px; color:var(--ink-soft); display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .trash-head b{ color:var(--bad); }
+  .linkbtn{ border:none; background:none; color:var(--accent-ink); font-weight:700; font-size:12.5px; cursor:pointer; text-decoration:underline; }
+  .chip{ display:inline-flex; align-items:center; gap:6px; font-size:12px; border:1px solid var(--line); border-radius:999px; padding:3px 6px 3px 3px; margin:8px 6px 0 0; background:var(--paper); }
+  .chip img, .chip .dot{ width:24px; height:24px; border-radius:50%; object-fit:cover; background:#fff; flex:none; }
+  .chip button{ border:none; background:none; cursor:pointer; color:var(--accent-ink); font-weight:800; font-size:13px; padding:0 2px; }
+
+  .lane{ margin-top:20px; }
+  .lane-head{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; padding-bottom:8px; border-bottom:1px solid var(--line); margin-bottom:12px; }
+  .lane-pick{ font-size:12px; color:var(--ink-soft); display:inline-flex; gap:6px; align-items:center; border:1px solid var(--line-strong); border-radius:7px; padding:4px 9px; background:var(--surface); cursor:pointer; }
+  .lane-pick input{ accent-color:#b4413a; }
   .lane-no{ font-size:16px; font-weight:800; }
-  .lane-hs{ font-family:var(--font-mono); font-size:12px; color:var(--ink-soft); }
-  .lane-name{ font-weight:700; font-size:13px; flex-basis:100%; }
+  .lane-hs{ font-family:var(--font-mono); font-size:12.5px; color:var(--ink-soft); }
+  .lane-name{ font-weight:700; }
+  .lane-count{ margin-left:auto; font-size:12px; color:var(--ink-soft); }
+  .lane-count em{ font-style:normal; color:var(--bad); }
   .lane-foot{ font-size:11.5px; color:var(--ink-soft); margin-top:8px; line-height:1.5; }
   .lane-foot.warn{ color:var(--warn); }
-  .cards{ display:grid; grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap:10px; }
-  .pcard{ border:1px solid color-mix(in srgb, var(--auto) 55%, var(--line)); border-radius:8px; overflow:hidden; display:flex; flex-direction:column; }
+  .cards{ display:grid; grid-template-columns:repeat(auto-fill, minmax(160px, 1fr)); gap:12px; }
+  .pcard{ position:relative; background:var(--surface); border:1px solid var(--line); border-radius:10px; overflow:hidden; display:flex; flex-direction:column; cursor:pointer; transition:box-shadow .12s; }
   .pcard.warn{ border-color:color-mix(in srgb, var(--warn) 60%, var(--line)); }
+  .pcard:hover{ box-shadow:0 0 0 2px color-mix(in srgb, var(--bad) 35%, transparent); }
+  .pcard.sel{ box-shadow:0 0 0 3px var(--bad); }
+  .pcard.sel img, .pcard.sel .noimg{ opacity:.5; }
+  .pick{ position:absolute; top:7px; left:7px; width:26px; height:26px; background:rgba(255,255,255,.95); border:1px solid #c7ced8; border-radius:7px; display:grid; place-items:center; z-index:1; }
+  .pick input{ width:16px; height:16px; accent-color:#b4413a; pointer-events:none; }
+  .nbadge{ position:absolute; top:8px; right:8px; font-size:10.5px; font-weight:700; background:var(--auto); color:#fff; padding:2px 8px; border-radius:999px; z-index:1; }
+  @media (prefers-color-scheme: dark){ .nbadge{ color:#0f1a14; } }
   .pcard img, .pcard .noimg{ display:block; width:100%; aspect-ratio:1; object-fit:contain; background:#fff; border-bottom:1px solid var(--line); }
   .pcard .noimg{ display:grid; place-items:center; color:#8a95a5; font-size:12px; background:repeating-linear-gradient(135deg,#f4f6f8 0 8px,#eceff3 8px 16px); }
   .pcard figcaption{ padding:8px 10px 10px; display:flex; flex-direction:column; gap:3px; }
@@ -154,6 +178,7 @@
   .sub{ font-size:11.5px; color:var(--ink-soft); }
   .nomatch{ border:1.5px dashed color-mix(in srgb, var(--bad) 45%, var(--line)); background:var(--bad-soft); color:var(--bad);
     border-radius:8px; padding:14px; font-size:12.5px; line-height:1.5; }
+  .empty{ border:1.5px dashed var(--line-strong); border-radius:8px; padding:14px; font-size:12.5px; color:var(--ink-soft); }
 
   .table-footnote{ padding:12px 18px 16px; font-size:12px; color:var(--ink-soft); border-top:1px solid var(--line); line-height:1.65; }
   .table-footnote b{ color:var(--ink); }
@@ -256,7 +281,7 @@
     <div class="titles">
       <span class="eyebrow">통다글로벌 · TONDA GLOBAL</span>
       <h1>검사사진 리스트</h1>
-      <span class="meta">검사건 리스트 데이터 · 마지막 자동 갱신 <b id="updatedAt">불러오는 중…</b> · 인보이스 엑셀을 올리면 검사란 품명과 같은 품목 사진만 추립니다 · 프로그램 <b>v1.1</b></span>
+      <span class="meta">검사건 리스트 데이터 · 마지막 자동 갱신 <b id="updatedAt">불러오는 중…</b> · 인보이스 엑셀을 올리면 검사란 품목 사진을 모두 보여줍니다 · 프로그램 <b>v1.2</b></span>
     </div>
     <div class="actions">
       <span class="sample-pill"><span class="sample-dot"></span>검사건 리스트 연동</span>
@@ -311,10 +336,10 @@
     </div>
     <div class="table-footnote">
       검사건은 <b>검사건 리스트</b>와 같은 데이터(중계 PC가 10분마다 갱신)를 불러옵니다. 각 건 오른쪽 칸에 그 건의 <b>인보이스 엑셀</b>(예: 「상품재질」 시트에 사진·품명·재질·세번이 있는 파일)을 끌어놓거나 클릭해서 올리면,
-      검사통보의 <b>란 세번과 같은 세번</b>이면서 <b>품명이 검사통보 품명과 같은 품목</b>의 사진만 보여줍니다(대소문자·띄어쓰기·기호 무시).
-      란 번호는 파일의 세번부호 종류를 오름차순으로 정렬한 순번, 행 번호는 같은 세번 안에서 파일에 나오는 순서로 계산합니다 — 계산한 란 번호가 검사통보와 다르면 노란 경고가 표시됩니다.
-      품명이 부분만 같거나 세번이 다른 품목은 노란색(확인 필요), 찾지 못한 란은 빨간색으로 표시됩니다. 올린 파일은 이 브라우저 안에서만 읽고 어디에도 전송하지 않습니다.
-      <b>HTML 다운로드</b>는 사진이 들어간 A4 양식 파일 하나로 저장되며(여러 건이면 건마다 한 장씩), 인터넷 없이 열리고 Ctrl+P로 인쇄·PDF 저장이 됩니다.
+      검사통보의 란 세번과 <b>같은 세번인 품목(그 란의 모든 행)</b> 사진을 모두 보여주고, 검사통보 품명과 같은 사진에는 <b>「통보 품명」</b> 표시를 붙입니다.
+      란 번호는 파일의 세번부호 종류를 오름차순으로 정렬한 순번, 행 번호는 같은 세번 안에서 파일에 나오는 순서로 계산합니다 — 계산이 검사통보와 다르거나 파일에 그 세번이 없으면 노란 경고가 표시됩니다.
+      필요 없는 사진은 <b>눌러서 선택 → 「선택 삭제」</b>로 빼고, 「삭제한 사진」에서 되돌릴 수 있습니다(삭제는 이 화면에서만 유지 — 새로고침하거나 파일을 다시 올리면 처음 상태).
+      <b>HTML 다운로드</b>는 삭제한 사진을 뺀 A4 양식 파일 하나로 저장되며(여러 건이면 건마다 이어서), 인터넷 없이 열리고 Ctrl+P로 인쇄·PDF 저장이 됩니다. 올린 파일은 이 브라우저 안에서만 읽고 어디에도 전송하지 않습니다.
     </div>
   </div>
 
@@ -626,7 +651,7 @@
     if (!pick) throw new Error('품명이 있는 품목 시트를 찾지 못했습니다');
     if (pick.cols.qty < 0) fillQty(wb, pick);
     const media = zip ? await findRowImages(zip, pick) : new Map();
-    pick.items.forEach(it => { it.media = media.get(it.r) || null; });
+    pick.items.forEach(it => { it.media = media.get(it.r) || null; it.id = 'r' + it.r; });
     // 란 = 세번 종류 오름차순 순번, 행 = 같은 세번 안의 파일 순서
     const hsList = [...new Set(pick.items.map(i => i.hs).filter(Boolean))].sort();
     const seen = {};
@@ -638,24 +663,35 @@
     return { zip, sheetName: pick.sheetName, items: pick.items, hsList, imageCount: media.size };
   }
 
-  /* ── 검사란 ↔ 파일 품목 매칭 ───────────────────────── */
+  /* ── 검사란 ↔ 파일 품목: 같은 세번이면 그 란의 모든 행 ── */
   const partialName = (a, b) => { const x = norm(a), y = norm(b); return Math.min(x.length, y.length) >= 3 && (x.includes(y) || y.includes(x)); };
 
   function matchLanes(noticeLanes, inv){
     return noticeLanes.map(n => {
       const nn = norm(n.name);
-      const pool = n.hs ? inv.items.filter(i => i.hs === n.hs) : [];
-      let hits = pool.filter(i => norm(i.name) === nn), kind = 'exact';
-      if (!hits.length && pool.length) { hits = pool.filter(i => partialName(i.name, n.name)); kind = 'partial'; }
-      if (!hits.length) { hits = inv.items.filter(i => norm(i.name) === nn); kind = n.hs ? 'hsdiff' : 'nohs'; }
-      if (!hits.length) kind = 'none';
-      const laneCalc = pool.length ? inv.hsList.indexOf(n.hs) + 1 : 0;
+      let items = n.hs ? inv.items.filter(i => i.hs === n.hs) : [];
+      let kind = 'lane';
+      if (!items.length) {   // 파일에 그 세번이 없음(세번 정정 등) → 품명으로 찾기
+        items = inv.items.filter(i => norm(i.name) === nn);
+        if (!items.length) items = inv.items.filter(i => partialName(i.name, n.name));
+        kind = items.length ? (n.hs ? 'hsdiff' : 'nohs') : 'none';
+      }
+      const laneCalc = kind === 'lane' ? inv.hsList.indexOf(n.hs) + 1 : 0;
       return {
-        notice: n, hits, kind,
-        others: kind === 'exact' || kind === 'partial' ? pool.length - hits.length : pool.length,
-        laneCalc, laneOk: !pool.length || laneCalc === n.lane,
+        notice: n, items, kind,
+        noticeIdx: items.findIndex(i => norm(i.name) === nn),
+        laneCalc, laneOk: kind !== 'lane' || laneCalc === n.lane,
       };
     });
+  }
+
+  function laneStatus(m){
+    if (m.kind === 'none')   return ['bad',  '✕ 해당 품목 없음'];
+    if (m.kind === 'hsdiff') return ['warn', '△ 파일에 이 세번 없음 · 품명으로 찾음'];
+    if (m.kind === 'nohs')   return ['warn', '△ 품명으로만 찾음'];
+    if (m.noticeIdx === 0)   return [m.laneOk ? 'ok' : 'warn', '✓ 1행 품명 = 통보 품명'];
+    if (m.noticeIdx > 0)     return ['warn', '△ 통보 품명이 ' + m.items[m.noticeIdx].row + '행 · 확인'];
+    return ['warn', '△ 통보 품명 없음 · 확인'];
   }
 
   const MIME = { png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', gif: 'image/gif', bmp: 'image/bmp', webp: 'image/webp' };
@@ -670,7 +706,7 @@
     return MIME[(path.split('.').pop() || '').toLowerCase()] || null;
   }
   async function attachImages(match, inv){
-    for (const m of match) for (const it of m.hits) {
+    for (const m of match) for (const it of m.items) {
       if (it.url || !it.media || !inv.zip) continue;
       const f = inv.zip.file(it.media);
       if (!f) continue;
@@ -681,14 +717,17 @@
     }
   }
   function releaseUrls(st){
-    if (st && st.match) st.match.forEach(m => m.hits.forEach(it => { if (it.url) URL.revokeObjectURL(it.url); }));
+    if (st && st.match) st.match.forEach(m => m.items.forEach(it => { if (it.url) URL.revokeObjectURL(it.url); }));
   }
 
+  const liveItems = (st, m) => m.items.filter(it => !st.deleted.has(it.id));
+  function shownCount(st){ return st.match.reduce((n, m) => n + liveItems(st, m).length, 0); }
+  function allItems(st){ const seen = new Set(), out = []; st.match.forEach(m => m.items.forEach(it => { if (!seen.has(it.id)) { seen.add(it.id); out.push([m, it]); } })); return out; }
+
   function summarize(match){
-    const ok = match.filter(m => m.kind === 'exact').length;
-    const warn = match.filter(m => m.kind === 'partial' || m.kind === 'hsdiff' || m.kind === 'nohs' || (m.hits.length && !m.laneOk)).length;
-    const none = match.filter(m => m.kind === 'none').length;
-    return { ok, warn, none, total: match.length, picked: match.reduce((n, m) => n + m.hits.length, 0), cls: none ? 'bad' : warn ? 'warn' : 'ok' };
+    let ok = 0, warn = 0, none = 0;
+    match.forEach(m => { const c = laneStatus(m)[0]; if (c === 'ok') ok++; else if (c === 'warn') warn++; else none++; });
+    return { ok, warn, none, total: match.length, cls: none ? 'bad' : warn ? 'warn' : 'ok' };
   }
 
   /* ── 업로드 처리 ─────────────────────────────────── */
@@ -713,7 +752,8 @@
       await attachImages(match, inv);
       if (results[key] !== undefined && results[key].token !== token) { releaseUrls({ match }); return; }
       inv.zip = null;   // 필요한 사진은 이미 꺼냈으므로 원본은 놓아줌
-      results[key] = { state: 'done', fileName: file.name, row: Object.assign({}, row), notice, inv, match, sum: summarize(match), open: true };
+      results[key] = { state: 'done', fileName: file.name, row: Object.assign({}, row), notice, inv, match, sum: summarize(match),
+                       open: true, selected: new Set(), deleted: new Set() };
     } catch (err) {
       console.error(err);
       if (results[key] && results[key].token !== token) return;
@@ -733,49 +773,72 @@
       + '<div class="file"><span class="xls">X</span><span class="fname" title="' + esc(st.fileName) + '">' + esc(st.fileName) + '</span></div></div>';
     if (st.state === 'error') return '<div class="errbox" data-drop="' + k + '" data-act="pick" data-key="' + k + '" role="button" tabindex="0">✕ ' + esc(st.error)
       + '<small>' + esc(st.fileName) + ' · 다른 파일을 끌어놓거나 클릭</small></div>';
-    const s = st.sum;
-    const pillText = s.none ? (s.total - s.none) + '/' + s.total + '란 찾음' : s.warn ? s.ok + '/' + s.total + '란 품명 일치 · 확인 ' + s.warn : s.ok + '/' + s.total + '란 품명 일치';
+    const s = st.sum, shown = shownCount(st);
+    const pillText = s.none ? (s.total - s.none) + '/' + s.total + '란 찾음' : s.warn ? '검사란 ' + s.total + '개 · 확인 ' + s.warn : '검사란 ' + s.total + '개';
     return '<div class="loaded" data-drop="' + k + '">'
       + '<div class="file"><span class="xls">X</span><span class="fname" title="' + esc(st.fileName) + '">' + esc(st.fileName) + '</span>'
       + '<button class="x" type="button" data-act="remove" data-key="' + k + '" title="파일 빼기">×</button></div>'
-      + '<div class="stat"><span class="pill ' + s.cls + '">' + pillText + '</span> &nbsp;' + st.inv.items.length + '품목 중 <b>' + s.picked + '</b>개</div>'
+      + '<div class="stat"><span class="pill ' + s.cls + '">' + pillText + '</span> &nbsp;' + st.inv.items.length + '품목 중 <b>' + shown + '</b>장'
+      + (st.deleted.size ? ' <span class="del">(삭제 ' + st.deleted.size + ')</span>' : '') + '</div>'
       + '<div class="rowbtns"><button class="mini" type="button" data-act="toggle" data-key="' + k + '">' + (st.open ? '사진 접기 ▴' : '사진 보기 ▾') + '</button>'
-      + '<button class="mini dl" type="button" data-act="html" data-key="' + k + '"' + (s.picked ? '' : ' disabled') + '>⬇ HTML</button></div></div>';
+      + '<button class="mini dl" type="button" data-act="html" data-key="' + k + '"' + (shown ? '' : ' disabled') + '>⬇ HTML</button></div></div>';
   }
 
   function laneTag(m, it){
-    if (m.kind === 'hsdiff' || m.kind === 'nohs') return m.notice.lane + '란 · 행 확인 필요';
+    if (m.kind !== 'lane') return m.notice.lane + '란 · 행 확인 필요';
     return m.notice.lane + '란 · ' + it.row + '행';
   }
 
-  function laneHtml(m){
-    const n = m.notice;
-    const pill = {
-      exact:   '<span class="pill ok">✓ 품명 일치</span>',
-      partial: '<span class="pill warn">△ 품명 부분 일치 · 확인</span>',
-      hsdiff:  '<span class="pill warn">△ 세번 다름 · 확인</span>',
-      nohs:    '<span class="pill warn">△ 품명으로만 찾음</span>',
-      none:    '<span class="pill bad">✕ 품명 일치 없음</span>',
-    }[m.kind];
-    const warnCard = m.kind !== 'exact';
-    const cards = m.hits.length
-      ? '<div class="cards">' + m.hits.map(it => '<figure class="pcard' + (warnCard ? ' warn' : '') + '">'
-          + (it.url ? '<img src="' + it.url + '" alt="' + esc(it.name) + '" loading="lazy">' : '<div class="noimg">사진 없음</div>')
-          + '<figcaption><div class="rowtag">' + esc(laneTag(m, it)) + '</div><div class="desc">' + esc(it.name) + '</div>'
-          + '<div class="sub">' + esc([m.kind === 'hsdiff' ? '파일 세번 ' + fmtHs(it.hs) : '', it.mat, it.qty ? '수량 ' + it.qty : ''].filter(Boolean).join(' · ')) + '</div>'
-          + '</figcaption></figure>').join('') + '</div>'
-      : '<div class="nomatch">이 란의 세번' + (n.hs ? '(' + fmtHs(n.hs) + ')' : '') + '에 "' + esc(n.name) + '" 품명이 없습니다 — 파일이 신고서와 다를 수 있습니다.</div>';
-    const foot = [];
-    if (m.others > 0 && m.kind !== 'hsdiff') foot.push('<div class="lane-foot">같은 란의 다른 품명 ' + m.others + '개 행은 제외</div>');
-    if (m.hits.length && !m.laneOk) foot.push('<div class="lane-foot warn">파일로 계산한 란 번호는 ' + m.laneCalc + '란 — 행 번호가 신고서와 다를 수 있습니다</div>');
-    return '<section class="lane"><div class="lane-head"><span class="lane-no">' + n.lane + '란</span><span class="lane-hs">' + fmtHs(n.hs) + '</span>' + pill
-      + '<span class="lane-name">' + esc(n.name) + '</span></div>' + cards + foot.join('') + '</section>';
+  function cardHtml(key, st, m, it){
+    const sel = st.selected.has(it.id);
+    const isNotice = norm(it.name) === norm(m.notice.name);
+    return '<figure class="pcard' + (sel ? ' sel' : '') + (m.kind !== 'lane' ? ' warn' : '') + '" data-act="photo" data-key="' + esc(key) + '" data-id="' + esc(it.id) + '" title="눌러서 선택">'
+      + '<span class="pick"><input type="checkbox" tabindex="-1"' + (sel ? ' checked' : '') + '></span>'
+      + (isNotice ? '<span class="nbadge">통보 품명</span>' : '')
+      + (it.url ? '<img src="' + it.url + '" alt="' + esc(it.name) + '" loading="lazy">' : '<div class="noimg">사진 없음</div>')
+      + '<figcaption><div class="rowtag">' + esc(laneTag(m, it)) + '</div><div class="desc">' + esc(it.name) + '</div>'
+      + '<div class="sub">' + esc([m.kind === 'hsdiff' ? '파일 세번 ' + fmtHs(it.hs) : '', it.mat, it.qty ? '수량 ' + it.qty : ''].filter(Boolean).join(' · ')) + '</div>'
+      + '</figcaption></figure>';
   }
 
-  function detailHtml(st){
-    return '<tr class="detail"><td colspan="6"><div class="how"><b>' + esc(st.inv.sheetName) + '</b> 시트 · ' + st.inv.items.length + '품목 · 사진 ' + st.inv.imageCount + '장 · 세번 '
-      + st.inv.hsList.length + '종 → 검사통보 품명과 같은 품목만 표시합니다. (란 = 세번 오름차순 순번, 행 = 같은 세번 안의 순서)</div>'
-      + '<div class="lanes">' + st.match.map(laneHtml).join('') + '</div></td></tr>';
+  function laneHtml(key, st, m, mi){
+    const n = m.notice, rest = liveItems(st, m), gone = m.items.length - rest.length;
+    const allSel = rest.length > 0 && rest.every(it => st.selected.has(it.id));
+    const [cls, label] = laneStatus(m);
+    let inner;
+    if (m.kind === 'none') inner = '<div class="nomatch">파일에서 이 란의 세번' + (n.hs ? '(' + fmtHs(n.hs) + ')' : '') + '이나 "' + esc(n.name) + '" 품명을 찾지 못했습니다 — 파일이 신고서와 다를 수 있습니다.</div>';
+    else if (!rest.length) inner = '<div class="empty">이 란의 사진을 모두 삭제했습니다 — 위 「삭제한 사진」에서 되돌릴 수 있습니다.</div>';
+    else inner = '<div class="cards">' + rest.map(it => cardHtml(key, st, m, it)).join('') + '</div>';
+    const foot = (m.kind === 'lane' && !m.laneOk)
+      ? '<div class="lane-foot warn">파일로 계산한 란 번호는 ' + m.laneCalc + '란 — 행 번호가 신고서와 다를 수 있습니다</div>' : '';
+    return '<section class="lane"><div class="lane-head">'
+      + (m.items.length ? '<label class="lane-pick"><input type="checkbox" data-act="lanesel" data-key="' + esc(key) + '" data-mi="' + mi + '"' + (allSel ? ' checked' : '') + (rest.length ? '' : ' disabled') + '> 란 전체 선택</label>' : '')
+      + '<span class="lane-no">' + n.lane + '란</span><span class="lane-hs">' + fmtHs(n.hs) + '</span><span class="lane-name">' + esc(n.name) + '</span>'
+      + '<span class="pill ' + cls + '">' + label + '</span>'
+      + '<span class="lane-count">' + rest.length + '장' + (gone ? ' <em>(삭제 ' + gone + ')</em>' : '') + '</span></div>'
+      + inner + foot + '</section>';
+  }
+
+  function detailHtml(key, st){
+    const k = esc(key), sel = st.selected.size;
+    const total = allItems(st).length;
+    let trash = '';
+    if (st.deleted.size) {
+      const chips = allItems(st).filter(([, it]) => st.deleted.has(it.id)).map(([m, it]) =>
+        '<span class="chip">' + (it.url ? '<img src="' + it.url + '" alt="">' : '<span class="dot"></span>') + esc(laneTag(m, it) + ' · ' + it.name)
+        + '<button type="button" data-act="restore" data-key="' + k + '" data-id="' + esc(it.id) + '" title="되돌리기">↺</button></span>').join('');
+      trash = '<div class="trash"><div class="trash-head">삭제한 사진 <b>' + st.deleted.size + '</b>장 — HTML 다운로드에서 빠집니다'
+        + '<button type="button" class="linkbtn" data-act="restoreall" data-key="' + k + '">모두 되돌리기</button></div><div>' + chips + '</div></div>';
+    }
+    return '<tr class="detail"><td colspan="6">'
+      + '<div class="seltools"><span><b>' + esc(st.inv.sheetName) + '</b> 시트 · ' + st.inv.items.length + '품목 · 사진 ' + st.inv.imageCount + '장 → <b>검사란 전체 품목 ' + total + '장</b>을 보여줍니다. '
+      + '사진을 눌러 선택한 뒤 「선택 삭제」로 빼면 HTML 다운로드에서도 빠집니다.</span>'
+      + '<span class="tool-btns"><span class="selinfo">선택 <b>' + sel + '</b>장</span>'
+      + '<button type="button" class="mini" data-act="selclear" data-key="' + k + '"' + (sel ? '' : ' disabled') + '>선택 해제</button>'
+      + '<button type="button" class="mini danger" data-act="seldel" data-key="' + k + '"' + (sel ? '' : ' disabled') + '>🗑 선택 삭제</button></span></div>'
+      + trash
+      + st.match.map((m, mi) => laneHtml(key, st, m, mi)).join('')
+      + '</td></tr>';
   }
 
   function render(){
@@ -792,7 +855,7 @@
         + '<td>' + esc(r.importer) + '</td>'
         + '<td class="remark">' + esc(r.remark) + '</td>'
         + '<td class="upcell">' + uploadCell(key, st) + '</td></tr>';
-      if (st && st.state === 'done' && st.open) html += detailHtml(st);
+      if (st && st.state === 'done' && st.open) html += detailHtml(key, st);
     });
     if (!rows.length) html = '<tr class="no-match"><td colspan="6">선택한 날짜(' + esc(s === e ? fmtKo(s) : fmtKo(s) + ' ~ ' + fmtKo(e)) + ')에 해당하는 검사건이 없습니다</td></tr>';
     body.innerHTML = html;
@@ -803,7 +866,7 @@
   }
 
   function readyRows(){
-    return visibleRows().map(r => results[keyOf(r)]).filter(st => st && st.state === 'done' && st.sum.picked);
+    return visibleRows().map(r => results[keyOf(r)]).filter(st => st && st.state === 'done' && shownCount(st));
   }
 
   /* ── HTML 다운로드 ───────────────────────────────── */
@@ -822,21 +885,27 @@
     });
   }
 
+  const WARN_TEXT = { hsdiff: '파일에 이 세번 없음 · 품명으로 찾음', nohs: '품명으로만 찾음' };
+
   async function pageHtml(st){
     const r = st.row;
-    let items = '';
+    let lanesHtml = '';
     for (const m of st.match) {
-      if (!m.hits.length) {
-        items += '<div class="it miss"><div class="missbox">' + esc(m.notice.lane + '란 ' + m.notice.name) + '<br>파일에서 같은 품명을 찾지 못했습니다</div></div>';
-        continue;
-      }
-      for (const it of m.hits) {
+      const n = m.notice, rest = liveItems(st, m);
+      lanesHtml += '<h2 class="ln">' + esc(n.lane + '란 ' + n.name) + ' <span>' + esc(fmtHs(n.hs)) + ' · ' + rest.length + '장</span></h2>';
+      if (m.kind === 'none') { lanesHtml += '<p class="miss">파일에서 이 란의 품목을 찾지 못했습니다 — 파일이 신고서와 다를 수 있습니다.</p>'; continue; }
+      if (!rest.length) { lanesHtml += '<p class="none">(이 란의 사진은 모두 삭제됨)</p>'; continue; }
+      let items = '';
+      for (const it of rest) {
         if (it.url && !it.dataUrl) it.dataUrl = await toDataUrl(it.url);
-        const warn = m.kind !== 'exact' ? '<div class="w">※ ' + ({ partial: '품명 부분 일치', hsdiff: '세번 다름(파일 ' + fmtHs(it.hs) + ')', nohs: '품명으로만 찾음' }[m.kind] || '') + ' — 확인 필요</div>' : '';
+        const isNotice = norm(it.name) === norm(n.name);
         items += '<div class="it">' + (it.dataUrl ? '<img src="' + it.dataUrl + '" alt="">' : '<div class="noimg">사진 없음</div>')
           + '<div class="cap"><b>' + esc(laneTag(m, it) + ' · ' + it.name) + '</b>'
-          + esc([fmtHs(m.kind === 'hsdiff' ? it.hs : m.notice.hs), it.mat, it.qty ? '수량 ' + it.qty : ''].filter(Boolean).join(' · ')) + warn + '</div></div>';
+          + esc([m.kind === 'hsdiff' ? '파일 세번 ' + fmtHs(it.hs) : '', it.mat, it.qty ? '수량 ' + it.qty : ''].filter(Boolean).join(' · '))
+          + (isNotice ? ' <i>통보 품명</i>' : '')
+          + (WARN_TEXT[m.kind] ? '<div class="w">※ ' + WARN_TEXT[m.kind] + ' — 확인 필요</div>' : '') + '</div></div>';
       }
+      lanesHtml += '<div class="grid">' + items + '</div>';
     }
     const lanes = st.notice.lanes.map(l => l.lane + '란 ' + l.name).join(' · ');
     const notes = st.notice.notes.map(esc).join('<br>');
@@ -844,7 +913,7 @@
       + '<table class="kv"><tr><th>수입신고번호</th><td>' + esc(r.declNo) + '</td><th>H B/L</th><td>' + esc(r.hbl) + '</td></tr>'
       + '<tr><th>수입화주</th><td>' + esc(r.importer) + '</td><th>신고일자</th><td>' + esc(r.date) + '</td></tr>'
       + '<tr><th>검사란</th><td colspan="3">' + esc(lanes) + (notes ? '<div class="notes">' + notes + '</div>' : '') + '</td></tr></table>'
-      + '<div class="grid">' + items + '</div>'
+      + lanesHtml
       + '<div class="foot"><span>통다글로벌 · 검사사진 리스트</span><span>' + esc(stamp()) + ' · ' + esc(st.fileName) + '</span></div></section>';
   }
 
@@ -860,17 +929,19 @@
       + '.page{width:210mm;min-height:297mm;margin:16px auto;background:#fff;padding:14mm 14mm 12mm;box-shadow:0 6px 24px rgba(0,0,0,.18);break-after:page;page-break-after:always}'
       + '.page:last-child{break-after:auto;page-break-after:auto}'
       + 'h1{font-size:20px;font-weight:800;margin-bottom:10px}'
-      + '.kv{width:100%;border-collapse:collapse;font-size:12.5px;margin-bottom:14px}'
+      + '.kv{width:100%;border-collapse:collapse;font-size:12.5px;margin-bottom:6px}'
       + '.kv th,.kv td{border:1px solid #c7ced8;padding:6px 9px;text-align:left;vertical-align:top}'
       + '.kv th{background:#f1f3f6;color:#48556a;width:92px;white-space:nowrap}.kv td{font-weight:600}'
       + '.notes{font-weight:400;color:#48556a;font-size:11px;margin-top:4px;line-height:1.5}'
-      + '.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}'
+      + '.ln{font-size:14px;font-weight:800;padding:6px 0;border-bottom:2px solid #16202e;margin:16px 0 10px;break-after:avoid;page-break-after:avoid}'
+      + '.ln span{font-size:12px;font-weight:600;color:#48556a}'
+      + '.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}'
       + '.it{border:1px solid #c7ced8;break-inside:avoid;page-break-inside:avoid}'
       + '.it img,.noimg{display:block;width:100%;aspect-ratio:1;object-fit:contain;background:#fff}'
       + '.noimg{display:grid;place-items:center;color:#8a95a5;font-size:12px;background:#f4f6f8}'
-      + '.cap{padding:7px 10px;font-size:11.5px;line-height:1.5;border-top:1px solid #c7ced8;color:#48556a}'
-      + '.cap b{display:block;font-size:13.5px;color:#16202e}.cap .w{color:#a8691a;font-weight:700}'
-      + '.missbox{aspect-ratio:1;display:grid;place-items:center;text-align:center;padding:14px;color:#b4413a;border:1px dashed #b4413a;margin:10px;font-size:13px;line-height:1.6}'
+      + '.cap{padding:6px 8px;font-size:11px;line-height:1.45;border-top:1px solid #c7ced8;color:#48556a}'
+      + '.cap b{display:block;font-size:12px;color:#16202e}.cap i{font-style:normal;font-weight:700;color:#2f6f52}.cap .w{color:#a8691a;font-weight:700}'
+      + '.miss{color:#b4413a;border:1px dashed #b4413a;padding:10px;font-size:12.5px}.none{color:#8a95a5;font-size:12px;padding:4px 0}'
       + '.foot{margin-top:16px;font-size:10px;color:#8a95a5;display:flex;justify-content:space-between;gap:12px}'
       + '@media print{body{background:#fff}.page{width:auto;min-height:0;margin:0;padding:0;box-shadow:none}}'
       + '</style></head><body>' + pages.join('') + '</body></html>';
@@ -914,11 +985,26 @@
 
   body.addEventListener('click', e => {
     const el = e.target.closest('[data-act]'); if (!el) return;
-    const key = el.dataset.key, act = el.dataset.act;
-    if (act === 'pick') { pendingKey = key; fileInput.click(); }
-    else if (act === 'toggle') { results[key].open = !results[key].open; render(); }
-    else if (act === 'remove') { releaseUrls(results[key]); delete results[key]; render(); }
-    else if (act === 'html') downloadOne(key, el);
+    const key = el.dataset.key, act = el.dataset.act, st = results[key];
+    if (act === 'pick') { pendingKey = key; fileInput.click(); return; }
+    if (act === 'lanesel') return;   // change 이벤트에서 처리
+    if (!st) return;
+    if (act === 'toggle') st.open = !st.open;
+    else if (act === 'remove') { releaseUrls(st); delete results[key]; }
+    else if (act === 'html') { downloadOne(key, el); return; }
+    else if (act === 'photo') { e.preventDefault(); const id = el.dataset.id; st.selected.has(id) ? st.selected.delete(id) : st.selected.add(id); }
+    else if (act === 'seldel') { st.selected.forEach(id => st.deleted.add(id)); st.selected.clear(); }
+    else if (act === 'selclear') st.selected.clear();
+    else if (act === 'restore') st.deleted.delete(el.dataset.id);
+    else if (act === 'restoreall') st.deleted.clear();
+    else return;
+    render();
+  });
+  body.addEventListener('change', e => {
+    const el = e.target; if (el.dataset.act !== 'lanesel') return;
+    const st = results[el.dataset.key]; if (!st) return;
+    liveItems(st, st.match[+el.dataset.mi]).forEach(it => el.checked ? st.selected.add(it.id) : st.selected.delete(it.id));
+    render();
   });
   body.addEventListener('keydown', e => {
     if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[data-act="pick"]')) { e.preventDefault(); e.target.click(); }
