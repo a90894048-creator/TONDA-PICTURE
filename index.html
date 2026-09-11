@@ -132,6 +132,7 @@
   .rowbtns .mini{ flex:1; }
   .mini.dl{ background:var(--accent); border-color:var(--accent); color:#fff; }
   .mini.danger{ background:var(--bad); border-color:var(--bad); color:#fff; }
+  .mini.pdf{ background:var(--accent-soft); border-color:var(--accent); color:var(--accent-ink); }
   @media (prefers-color-scheme: dark){ .mini.dl, .mini.danger{ color:#1a1405; } }
 
   /* 검사란 사진 영역 */
@@ -281,7 +282,7 @@
     <div class="titles">
       <span class="eyebrow">통다글로벌 · TONDA GLOBAL</span>
       <h1>검사사진 리스트</h1>
-      <span class="meta">검사건 리스트 데이터 · 마지막 자동 갱신 <b id="updatedAt">불러오는 중…</b> · 인보이스 엑셀을 올리면 검사란 품목 사진을 모두 보여줍니다 · 프로그램 <b>v1.2</b></span>
+      <span class="meta">검사건 리스트 데이터 · 마지막 자동 갱신 <b id="updatedAt">불러오는 중…</b> · 인보이스 엑셀을 올리면 검사란 품목 사진을 모두 보여줍니다 · 프로그램 <b>v1.3</b></span>
     </div>
     <div class="actions">
       <span class="sample-pill"><span class="sample-dot"></span>검사건 리스트 연동</span>
@@ -292,6 +293,10 @@
       <button class="btn btn-primary" id="bulkBtn" type="button" disabled>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
         <span id="bulkLabel">HTML 다운로드</span>
+      </button>
+      <button class="btn" id="bulkPdfBtn" type="button" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+        <span id="bulkPdfLabel">PDF 다운로드</span>
       </button>
     </div>
   </div>
@@ -339,7 +344,7 @@
       검사통보의 란 세번과 <b>같은 세번인 품목(그 란의 모든 행)</b> 사진을 모두 보여주고, 검사통보 품명과 같은 사진에는 <b>「통보 품명」</b> 표시를 붙입니다.
       란 번호는 파일의 세번부호 종류를 오름차순으로 정렬한 순번, 행 번호는 같은 세번 안에서 파일에 나오는 순서로 계산합니다 — 계산이 검사통보와 다르거나 파일에 그 세번이 없으면 노란 경고가 표시됩니다.
       필요 없는 사진은 <b>눌러서 선택 → 「선택 삭제」</b>로 빼고, 「삭제한 사진」에서 되돌릴 수 있습니다(삭제는 이 화면에서만 유지 — 새로고침하거나 파일을 다시 올리면 처음 상태).
-      <b>HTML 다운로드</b>는 삭제한 사진을 뺀 A4 양식 파일 하나로 저장되며(여러 건이면 건마다 이어서), 인터넷 없이 열리고 Ctrl+P로 인쇄·PDF 저장이 됩니다. 올린 파일은 이 브라우저 안에서만 읽고 어디에도 전송하지 않습니다.
+      <b>HTML·PDF 다운로드</b>는 삭제한 사진을 뺀 A4 양식 파일 하나로 저장됩니다(여러 건이면 건마다 이어서). HTML은 인터넷 없이 열리고, PDF는 사진이 줄 단위로 페이지에 나뉘어 들어가 바로 인쇄·전송할 수 있습니다. 올린 파일은 이 브라우저 안에서만 읽고 어디에도 전송하지 않습니다.
     </div>
   </div>
 
@@ -781,7 +786,8 @@
       + '<div class="stat"><span class="pill ' + s.cls + '">' + pillText + '</span> &nbsp;' + st.inv.items.length + '품목 중 <b>' + shown + '</b>장'
       + (st.deleted.size ? ' <span class="del">(삭제 ' + st.deleted.size + ')</span>' : '') + '</div>'
       + '<div class="rowbtns"><button class="mini" type="button" data-act="toggle" data-key="' + k + '">' + (st.open ? '사진 접기 ▴' : '사진 보기 ▾') + '</button>'
-      + '<button class="mini dl" type="button" data-act="html" data-key="' + k + '"' + (shown ? '' : ' disabled') + '>⬇ HTML</button></div></div>';
+      + '<button class="mini dl" type="button" data-act="html" data-key="' + k + '"' + (shown ? '' : ' disabled') + '>⬇ HTML</button>'
+      + '<button class="mini pdf" type="button" data-act="pdf" data-key="' + k + '"' + (shown ? '' : ' disabled') + '>⬇ PDF</button></div></div>';
   }
 
   function laneTag(m, it){
@@ -863,6 +869,8 @@
     $('resultCount').innerHTML = '<b>' + rows.length + '</b>건 표시 중 · 파일 올림 <b>' + ready.length + '</b>건';
     $('bulkBtn').disabled = !ready.length;
     $('bulkLabel').textContent = ready.length ? 'HTML 다운로드 (파일 올린 ' + ready.length + '건)' : 'HTML 다운로드';
+    $('bulkPdfBtn').disabled = !ready.length;
+    $('bulkPdfLabel').textContent = ready.length ? 'PDF 다운로드 (' + ready.length + '건)' : 'PDF 다운로드';
   }
 
   function readyRows(){
@@ -874,10 +882,11 @@
     return new Promise(resolve => {
       const img = new Image();
       img.onload = () => {
-        const sc = Math.min(1, 900 / Math.max(img.naturalWidth, img.naturalHeight));
-        const c = document.createElement('canvas');
-        c.width = Math.max(1, Math.round(img.naturalWidth * sc)); c.height = Math.max(1, Math.round(img.naturalHeight * sc));
-        const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); g.drawImage(img, 0, 0, c.width, c.height);
+        // 흰 바탕 정사각형(700px) 가운데에 비율 유지해 배치 — HTML·PDF 모두 같은 크기로 보이게
+        const S = 700, sc = Math.min(S / img.naturalWidth, S / img.naturalHeight, 1.5);
+        const w = Math.max(1, Math.round(img.naturalWidth * sc)), h = Math.max(1, Math.round(img.naturalHeight * sc));
+        const c = document.createElement('canvas'); c.width = c.height = S;
+        const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, S, S); g.drawImage(img, (S - w) / 2, (S - h) / 2, w, h);
         resolve(c.toDataURL('image/jpeg', 0.85));
       };
       img.onerror = () => resolve('');
@@ -887,32 +896,42 @@
 
   const WARN_TEXT = { hsdiff: '파일에 이 세번 없음 · 품명으로 찾음', nohs: '품명으로만 찾음' };
 
-  async function pageHtml(st){
+  const MISS_HTML = '<p class="miss">파일에서 이 란의 품목을 찾지 못했습니다 — 파일이 신고서와 다를 수 있습니다.</p>';
+  const NONE_HTML = '<p class="none">(이 란의 사진은 모두 삭제됨)</p>';
+  const laneHeadHtml = (n, count) => '<h2 class="ln">' + esc(n.lane + '란 ' + n.name) + ' <span>' + esc(fmtHs(n.hs)) + ' · ' + count + '장</span></h2>';
+
+  function caseHeadHtml(st){
     const r = st.row;
+    const lanes = st.notice.lanes.map(l => l.lane + '란 ' + l.name).join(' · ');
+    const notes = st.notice.notes.map(esc).join('<br>');
+    return '<h1>검사사진 리스트</h1>'
+      + '<table class="kv"><tr><th>수입신고번호</th><td>' + esc(r.declNo) + '</td><th>H B/L</th><td>' + esc(r.hbl) + '</td></tr>'
+      + '<tr><th>수입화주</th><td>' + esc(r.importer) + '</td><th>신고일자</th><td>' + esc(r.date) + '</td></tr>'
+      + '<tr><th>검사란</th><td colspan="3">' + esc(lanes) + (notes ? '<div class="notes">' + notes + '</div>' : '') + '</td></tr></table>';
+  }
+
+  async function itemHtml(m, it){
+    if (it.url && !it.dataUrl) it.dataUrl = await toDataUrl(it.url);
+    const isNotice = norm(it.name) === norm(m.notice.name);
+    return '<div class="it">' + (it.dataUrl ? '<img src="' + it.dataUrl + '" alt="">' : '<div class="noimg">사진 없음</div>')
+      + '<div class="cap"><b>' + esc(laneTag(m, it) + ' · ' + it.name) + '</b>'
+      + esc([m.kind === 'hsdiff' ? '파일 세번 ' + fmtHs(it.hs) : '', it.mat, it.qty ? '수량 ' + it.qty : ''].filter(Boolean).join(' · '))
+      + (isNotice ? ' <i>통보 품명</i>' : '')
+      + (WARN_TEXT[m.kind] ? '<div class="w">※ ' + WARN_TEXT[m.kind] + ' — 확인 필요</div>' : '') + '</div></div>';
+  }
+
+  async function pageHtml(st){
     let lanesHtml = '';
     for (const m of st.match) {
       const n = m.notice, rest = liveItems(st, m);
-      lanesHtml += '<h2 class="ln">' + esc(n.lane + '란 ' + n.name) + ' <span>' + esc(fmtHs(n.hs)) + ' · ' + rest.length + '장</span></h2>';
-      if (m.kind === 'none') { lanesHtml += '<p class="miss">파일에서 이 란의 품목을 찾지 못했습니다 — 파일이 신고서와 다를 수 있습니다.</p>'; continue; }
-      if (!rest.length) { lanesHtml += '<p class="none">(이 란의 사진은 모두 삭제됨)</p>'; continue; }
+      lanesHtml += laneHeadHtml(n, rest.length);
+      if (m.kind === 'none') { lanesHtml += MISS_HTML; continue; }
+      if (!rest.length) { lanesHtml += NONE_HTML; continue; }
       let items = '';
-      for (const it of rest) {
-        if (it.url && !it.dataUrl) it.dataUrl = await toDataUrl(it.url);
-        const isNotice = norm(it.name) === norm(n.name);
-        items += '<div class="it">' + (it.dataUrl ? '<img src="' + it.dataUrl + '" alt="">' : '<div class="noimg">사진 없음</div>')
-          + '<div class="cap"><b>' + esc(laneTag(m, it) + ' · ' + it.name) + '</b>'
-          + esc([m.kind === 'hsdiff' ? '파일 세번 ' + fmtHs(it.hs) : '', it.mat, it.qty ? '수량 ' + it.qty : ''].filter(Boolean).join(' · '))
-          + (isNotice ? ' <i>통보 품명</i>' : '')
-          + (WARN_TEXT[m.kind] ? '<div class="w">※ ' + WARN_TEXT[m.kind] + ' — 확인 필요</div>' : '') + '</div></div>';
-      }
+      for (const it of rest) items += await itemHtml(m, it);
       lanesHtml += '<div class="grid">' + items + '</div>';
     }
-    const lanes = st.notice.lanes.map(l => l.lane + '란 ' + l.name).join(' · ');
-    const notes = st.notice.notes.map(esc).join('<br>');
-    return '<section class="page"><h1>검사사진 리스트</h1>'
-      + '<table class="kv"><tr><th>수입신고번호</th><td>' + esc(r.declNo) + '</td><th>H B/L</th><td>' + esc(r.hbl) + '</td></tr>'
-      + '<tr><th>수입화주</th><td>' + esc(r.importer) + '</td><th>신고일자</th><td>' + esc(r.date) + '</td></tr>'
-      + '<tr><th>검사란</th><td colspan="3">' + esc(lanes) + (notes ? '<div class="notes">' + notes + '</div>' : '') + '</td></tr></table>'
+    return '<section class="page">' + caseHeadHtml(st)
       + lanesHtml
       + '<div class="foot"><span>통다글로벌 · 검사사진 리스트</span><span>' + esc(stamp()) + ' · ' + esc(st.fileName) + '</span></div></section>';
   }
@@ -947,31 +966,134 @@
       + '</style></head><body>' + pages.join('') + '</body></html>';
   }
 
-  function saveFile(html, filename){
-    const url = URL.createObjectURL(new Blob([html], { type: 'text/html;charset=utf-8' }));
+  function saveFile(data, filename){
+    const blob = data instanceof Blob ? data : new Blob([data], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url; a.download = filename.replace(/[\\/:*?"<>|]/g, '_');
     document.body.appendChild(a); a.click();
     setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1500);
   }
 
-  async function downloadOne(key, btn){
-    const st = results[key]; if (!st || st.state !== 'done') return;
-    if (btn) { btn.disabled = true; btn.textContent = '만드는 중…'; }
-    try {
-      saveFile(docHtml('검사사진 리스트 ' + st.row.hbl, [await pageHtml(st)]), '검사사진리스트_' + st.row.hbl + '_' + st.row.date + '.html');
-    } finally { render(); }
+  /* ── PDF: A4 페이지를 화면 밖에 그려 이미지로 PDF에 넣음 (한글 글꼴 내장 불필요) ── */
+  const PDF_LIBS = [
+    'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
+  ];
+  const scriptLoads = {};
+  function loadScript(src){
+    return scriptLoads[src] || (scriptLoads[src] = new Promise((resolve, reject) => {
+      const el = document.createElement('script');
+      el.src = src; el.onload = resolve;
+      el.onerror = () => { delete scriptLoads[src]; el.remove(); reject(new Error('PDF 도구를 불러오지 못했습니다 (인터넷 연결 확인)')); };
+      document.head.appendChild(el);
+    }));
   }
 
-  async function downloadBulk(){
-    const list = readyRows(); if (!list.length) return;
-    const btn = $('bulkBtn'); btn.disabled = true; $('bulkLabel').textContent = '만드는 중…';
+  const PDF_CSS = '.pdfroot{position:fixed;left:-10000px;top:0;width:794px}'
+    + '.pp{width:794px;height:1123px;background:#fff;color:#16202e;padding:34px 40px 0;box-sizing:border-box;position:relative;overflow:hidden;font-family:"Malgun Gothic","Apple SD Gothic Neo","Noto Sans KR",sans-serif}'
+    + '.pp *{box-sizing:border-box;margin:0;padding:0}'
+    + '.pp h1{font-size:20px;font-weight:800;margin-bottom:10px}'
+    + '.pp .kv{width:100%;min-width:0;border-collapse:collapse;font-size:12.5px;margin-bottom:4px}'   // 화면용 table{min-width:1180px} 무시
+    + '.pp .kv th,.pp .kv td{border:1px solid #c7ced8;padding:6px 9px;text-align:left;vertical-align:top}'
+    + '.pp .kv th{background:#f1f3f6;color:#48556a;width:92px;white-space:nowrap}.pp .kv td{font-weight:600}'
+    + '.pp .notes{font-weight:400;color:#48556a;font-size:11px;margin-top:4px;line-height:1.5}'
+    + '.pp .cont{font-size:12px;color:#48556a;font-weight:700;padding-bottom:6px;border-bottom:1px solid #c7ced8}'
+    + '.pp .ln{font-size:14px;font-weight:800;padding:6px 0;border-bottom:2px solid #16202e;margin:12px 0 10px}'
+    + '.pp .ln span{font-size:12px;font-weight:600;color:#48556a}'
+    + '.pp .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px}'
+    + '.pp .it{border:1px solid #c7ced8}'
+    + '.pp .it img,.pp .noimg{display:block;width:100%;aspect-ratio:1/1}'
+    + '.pp .noimg{display:flex;align-items:center;justify-content:center;color:#8a95a5;font-size:12px;background:#f4f6f8}'
+    + '.pp .cap{padding:6px 8px;font-size:11px;line-height:1.45;border-top:1px solid #c7ced8;color:#48556a}'
+    + '.pp .cap b{display:block;font-size:12px;color:#16202e}.pp .cap i{font-style:normal;font-weight:700;color:#2f6f52}.pp .cap .w{color:#a8691a;font-weight:700}'
+    + '.pp .miss{color:#b4413a;border:1px dashed #b4413a;padding:10px;font-size:12.5px;margin-bottom:8px}.pp .none{color:#8a95a5;font-size:12px;padding:4px 0 8px}'
+    + '.pp .pf{position:absolute;left:40px;right:40px;bottom:16px;font-size:10px;color:#8a95a5;display:flex;justify-content:space-between}';
+  const PDF_AVAIL = 1123 - 34 - 46;   // 페이지 높이 - 위 여백 - 아래 꼬리말 자리
+
+  // 한 건을 블록(머리표 · 란 제목+첫 줄 · 사진 줄…)으로 나눔 — 블록 단위로 페이지를 넘겨 사진이 잘리지 않게
+  async function caseBlocks(st){
+    const blocks = [caseHeadHtml(st)];
+    for (const m of st.match) {
+      const rest = liveItems(st, m), head = laneHeadHtml(m.notice, rest.length);
+      if (m.kind === 'none') { blocks.push(head + MISS_HTML); continue; }
+      if (!rest.length) { blocks.push(head + NONE_HTML); continue; }
+      const cells = [];
+      for (const it of rest) cells.push(await itemHtml(m, it));
+      for (let i = 0; i < cells.length; i += 3) blocks.push((i ? '' : head) + '<div class="grid">' + cells.slice(i, i + 3).join('') + '</div>');
+    }
+    return blocks;
+  }
+
+  async function buildPdf(list, onProgress){
+    for (const src of PDF_LIBS) await loadScript(src);
+    const root = document.createElement('div');
+    root.className = 'pdfroot';
+    root.innerHTML = '<style>' + PDF_CSS + '</style>';
+    document.body.appendChild(root);
     try {
       const pages = [];
-      for (const st of list) pages.push(await pageHtml(st));
+      for (const st of list) {
+        let pc = null, count = 0;
+        const newPage = cont => {
+          const p = document.createElement('div'); p.className = 'pp';
+          pc = document.createElement('div'); p.appendChild(pc); root.appendChild(p);
+          pages.push({ el: p, st }); count = 0;
+          if (cont) pc.insertAdjacentHTML('beforeend', '<div class="cont">검사사진 리스트 (계속) · ' + esc(st.row.hbl) + ' · ' + esc(st.row.importer) + '</div>');
+        };
+        newPage(false);
+        for (const html of await caseBlocks(st)) {
+          const b = document.createElement('div'); b.innerHTML = html;
+          pc.appendChild(b); count++;
+          if (pc.offsetHeight > PDF_AVAIL && count > 1) { pc.removeChild(b); newPage(true); pc.appendChild(b); count = 1; }
+        }
+      }
+      const when = stamp();
+      pages.forEach(({ el, st }, i) => el.insertAdjacentHTML('beforeend',
+        '<div class="pf"><span>통다글로벌 · 검사사진 리스트 · ' + esc(st.row.declNo) + '</span><span>' + esc(when) + ' · ' + (i + 1) + '/' + pages.length + '</span></div>'));
+      await Promise.all([...root.querySelectorAll('img')].map(img => img.decode ? img.decode().catch(() => {}) : null));
+      const pdf = new window.jspdf.jsPDF({ unit: 'mm', format: 'a4', compress: true });
+      for (let i = 0; i < pages.length; i++) {
+        if (onProgress) onProgress(i + 1, pages.length);
+        const canvas = await window.html2canvas(pages[i].el, { scale: 2, backgroundColor: '#ffffff', logging: false });
+        if (i) pdf.addPage();
+        pdf.addImage(canvas.toDataURL('image/jpeg', 0.88), 'JPEG', 0, 0, 210, 297);
+      }
+      return pdf.output('blob');
+    } finally { root.remove(); }
+  }
+
+  let busy = false;   // 다운로드 파일을 두 번 겹쳐 만들지 않도록
+  async function downloadOne(key, btn, fmt){
+    const st = results[key]; if (!st || st.state !== 'done' || busy) return;
+    busy = true;
+    const setLabel = t => { if (btn) btn.textContent = t; };
+    if (btn) btn.disabled = true;
+    setLabel('만드는 중…');
+    try {
+      const base = '검사사진리스트_' + st.row.hbl + '_' + st.row.date;
+      if (fmt === 'pdf') saveFile(await buildPdf([st], (i, n) => setLabel('PDF ' + i + '/' + n)), base + '.pdf');
+      else saveFile(docHtml('검사사진 리스트 ' + st.row.hbl, [await pageHtml(st)]), base + '.html');
+    } catch (err) { console.error(err); alert((fmt === 'pdf' ? 'PDF' : 'HTML') + ' 만들기 실패: ' + (err.message || err)); }
+    finally { busy = false; render(); }
+  }
+
+  async function downloadBulk(fmt){
+    const list = readyRows(); if (!list.length || busy) return;
+    busy = true;
+    const btn = fmt === 'pdf' ? $('bulkPdfBtn') : $('bulkBtn'), label = fmt === 'pdf' ? $('bulkPdfLabel') : $('bulkLabel');
+    btn.disabled = true; label.textContent = '만드는 중…';
+    try {
       const [s, e] = currentRange();
-      saveFile(docHtml('검사사진 리스트 ' + list.length + '건', pages), '검사사진리스트_' + (s === e ? s : s + '~' + e) + '_' + list.length + '건.html');
-    } finally { render(); }
+      const base = '검사사진리스트_' + (s === e ? s : s + '~' + e) + '_' + list.length + '건';
+      if (fmt === 'pdf') saveFile(await buildPdf(list, (i, n) => { label.textContent = 'PDF 만드는 중… ' + i + '/' + n; }), base + '.pdf');
+      else {
+        const pages = [];
+        for (const st of list) pages.push(await pageHtml(st));
+        saveFile(docHtml('검사사진 리스트 ' + list.length + '건', pages), base + '.html');
+      }
+    } catch (err) { console.error(err); alert((fmt === 'pdf' ? 'PDF' : 'HTML') + ' 만들기 실패: ' + (err.message || err)); }
+    finally { busy = false; render(); }
   }
 
   /* ── 이벤트 ──────────────────────────────────────── */
@@ -991,7 +1113,7 @@
     if (!st) return;
     if (act === 'toggle') st.open = !st.open;
     else if (act === 'remove') { releaseUrls(st); delete results[key]; }
-    else if (act === 'html') { downloadOne(key, el); return; }
+    else if (act === 'html' || act === 'pdf') { downloadOne(key, el, act); return; }
     else if (act === 'photo') { e.preventDefault(); const id = el.dataset.id; st.selected.has(id) ? st.selected.delete(id) : st.selected.add(id); }
     else if (act === 'seldel') { st.selected.forEach(id => st.deleted.add(id)); st.selected.clear(); }
     else if (act === 'selclear') st.selected.clear();
@@ -1030,7 +1152,8 @@
     if (f) handleFile(z.dataset.drop, f);
   });
 
-  $('bulkBtn').addEventListener('click', downloadBulk);
+  $('bulkBtn').addEventListener('click', () => downloadBulk('html'));
+  $('bulkPdfBtn').addEventListener('click', () => downloadBulk('pdf'));
   $('refreshBtn').addEventListener('click', () => loadData(true));
   [dateStart, dateEnd].forEach(el => el.addEventListener('change', render));
   $('prevDay').addEventListener('click', () => { const [s, e] = currentRange(); dateStart.value = isoAdd(s, -1); dateEnd.value = isoAdd(e, -1); render(); });
