@@ -659,13 +659,25 @@
   }
 
   const MIME = { png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', gif: 'image/gif', bmp: 'image/bmp', webp: 'image/webp' };
+  // 확장자가 .bin 등이어도 실제 내용(앞부분 바이트)으로 이미지 형식 판별 — WPS가 PNG를 image23.bin으로 저장하는 경우 있음
+  function sniffMime(ab, path){
+    const b = new Uint8Array(ab, 0, Math.min(12, ab.byteLength));
+    if (b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4E && b[3] === 0x47) return 'image/png';
+    if (b[0] === 0xFF && b[1] === 0xD8 && b[2] === 0xFF) return 'image/jpeg';
+    if (b[0] === 0x47 && b[1] === 0x49 && b[2] === 0x46) return 'image/gif';
+    if (b[0] === 0x42 && b[1] === 0x4D) return 'image/bmp';
+    if (b[0] === 0x52 && b[1] === 0x49 && b[2] === 0x46 && b[3] === 0x46 && b[8] === 0x57 && b[9] === 0x45 && b[10] === 0x42 && b[11] === 0x50) return 'image/webp';
+    return MIME[(path.split('.').pop() || '').toLowerCase()] || null;
+  }
   async function attachImages(match, inv){
     for (const m of match) for (const it of m.hits) {
       if (it.url || !it.media || !inv.zip) continue;
       const f = inv.zip.file(it.media);
-      const mime = MIME[(it.media.split('.').pop() || '').toLowerCase()];
-      if (!f || !mime) continue;   // emf/wmf 등 브라우저가 못 여는 형식은 "사진 없음"
-      it.url = URL.createObjectURL(new Blob([await f.async('arraybuffer')], { type: mime }));
+      if (!f) continue;
+      const ab = await f.async('arraybuffer');
+      const mime = sniffMime(ab, it.media);
+      if (!mime) continue;   // emf/wmf 등 브라우저가 못 여는 형식은 "사진 없음"
+      it.url = URL.createObjectURL(new Blob([ab], { type: mime }));
     }
   }
   function releaseUrls(st){
