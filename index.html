@@ -72,6 +72,11 @@
     border:1px solid color-mix(in srgb, var(--accent) 35%, transparent); padding:7px 12px; border-radius:7px; cursor:pointer; }
   .result-count{ font-size:12.5px; color:var(--ink-soft); }
   .result-count b{ color:var(--ink); }
+  .stale{ display:flex; align-items:center; gap:10px 14px; flex-wrap:wrap; background:var(--warn-soft); border:1px solid color-mix(in srgb, var(--warn) 45%, transparent);
+    color:var(--ink); border-radius:10px; padding:11px 14px; font-size:12.5px; line-height:1.55; }
+  .stale[hidden]{ display:none; }
+  .stale b{ color:var(--warn); }
+  .stale .mini{ margin-left:auto; }
 
   .table-card{ background:var(--surface); border:1px solid var(--line); border-radius:12px; box-shadow:var(--shadow); overflow:hidden; }
   .table-toolbar{ display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px 20px; padding:14px 18px; border-bottom:1px solid var(--line); }
@@ -282,7 +287,7 @@
     <div class="titles">
       <span class="eyebrow">통다글로벌 · TONDA GLOBAL</span>
       <h1>검사사진 리스트</h1>
-      <span class="meta">검사건 리스트 데이터 · 마지막 자동 갱신 <b id="updatedAt">불러오는 중…</b> · 인보이스 엑셀을 올리면 검사란 품목 사진을 모두 보여줍니다 · 프로그램 <b>v1.3</b></span>
+      <span class="meta">검사건 리스트 데이터 · 마지막 자동 갱신 <b id="updatedAt">불러오는 중…</b> <span id="checkedAt"></span> · 인보이스 엑셀을 올리면 검사란 품목 사진을 모두 보여줍니다 · 프로그램 <b>v1.4</b></span>
     </div>
     <div class="actions">
       <span class="sample-pill"><span class="sample-dot"></span>검사건 리스트 연동</span>
@@ -300,6 +305,8 @@
       </button>
     </div>
   </div>
+
+  <div class="stale" id="staleBanner" hidden></div>
 
   <div class="datebar">
     <div class="field">
@@ -340,7 +347,7 @@
       </table>
     </div>
     <div class="table-footnote">
-      검사건은 <b>검사건 리스트</b>와 같은 데이터(중계 PC가 10분마다 갱신)를 불러옵니다. 각 건 오른쪽 칸에 그 건의 <b>인보이스 엑셀</b>(예: 「상품재질」 시트에 사진·품명·재질·세번이 있는 파일)을 끌어놓거나 클릭해서 올리면,
+      검사건은 <b>검사건 리스트</b>와 같은 데이터(중계 PC가 10분마다 갱신)를 불러옵니다. 이 화면은 <b>5분마다, 그리고 이 탭으로 돌아올 때 자동으로 다시 불러오며</b> 올린 파일과 삭제 상태는 그대로 유지됩니다 — 마지막 자동 갱신이 30분 넘게 멈추면 위에 노란 경고가 나옵니다. 각 건 오른쪽 칸에 그 건의 <b>인보이스 엑셀</b>(예: 「상품재질」 시트에 사진·품명·재질·세번이 있는 파일)을 끌어놓거나 클릭해서 올리면,
       검사통보의 란 세번과 <b>같은 세번인 품목(그 란의 모든 행)</b> 사진을 모두 보여주고, 검사통보 품명과 같은 사진에는 <b>「통보 품명」</b> 표시를 붙입니다.
       란 번호는 파일의 세번부호 종류를 오름차순으로 정렬한 순번, 행 번호는 같은 세번 안에서 파일에 나오는 순서로 계산합니다 — 계산이 검사통보와 다르거나 파일에 그 세번이 없으면 노란 경고가 표시됩니다.
       필요 없는 사진은 <b>눌러서 선택 → 「선택 삭제」</b>로 빼고, 「삭제한 사진」에서 되돌릴 수 있습니다(삭제는 이 화면에서만 유지 — 새로고침하거나 파일을 다시 올리면 처음 상태).
@@ -371,6 +378,7 @@
   let feed = null;          // data.json
   let TODAY = '';
   let initialized = false;
+  let lastLoad = 0, loading = false;   // 자동 다시 불러오기용
   const results = {};       // 검사건 키 → 업로드·매칭 결과
 
   const keyOf = r => r.declNo || ('hbl:' + r.hbl);
@@ -1161,31 +1169,70 @@
   $('todayBtn').addEventListener('click', () => { dateStart.value = dateEnd.value = TODAY; render(); });
 
   /* ── 데이터 불러오기 ─────────────────────────────── */
+  const hhmm = d => String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+
   async function loadData(refresh){
+    if (loading) return;
+    loading = true;
     let lastErr = null;
-    for (const url of DATA_URLS) {
-      try {
-        const res = await fetch(url + (refresh ? '?t=' + Date.now() : ''), { cache: refresh ? 'no-store' : 'default' });
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        feed = await res.json();
-        TODAY = feed.today;
-        $('updatedAt').textContent = feed.updated;
-        if (!initialized) {
-          // 오늘 검사건이 아직 없으면 가장 최근 날짜를 먼저 보여줌
-          const dates = feed.rows.map(r => r.date).filter(d => d && d <= TODAY).sort();
-          const start = feed.rows.some(r => r.date === TODAY) || !dates.length ? TODAY : dates[dates.length - 1];
-          dateStart.value = dateEnd.value = start;
-          initialized = true;
-        }
-        render();
+    try {
+      for (const url of DATA_URLS) {
+        try {
+          const res = await fetch(url + (refresh ? '?t=' + Date.now() : ''), { cache: refresh ? 'no-store' : 'default' });
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          const next = await res.json();
+          const prevToday = TODAY;
+          feed = next;
+          TODAY = feed.today;
+          lastLoad = Date.now();
+          $('updatedAt').textContent = feed.updated;
+          $('checkedAt').textContent = '(화면 확인 ' + hhmm(new Date()) + ')';
+          if (!initialized) {
+            // 오늘 검사건이 아직 없으면 가장 최근 날짜를 먼저 보여줌
+            const dates = feed.rows.map(r => r.date).filter(d => d && d <= TODAY).sort();
+            const start = feed.rows.some(r => r.date === TODAY) || !dates.length ? TODAY : dates[dates.length - 1];
+            dateStart.value = dateEnd.value = start;
+            initialized = true;
+          } else if (prevToday && TODAY !== prevToday && dateStart.value === prevToday && dateEnd.value === prevToday) {
+            dateStart.value = dateEnd.value = TODAY;   // 켜둔 채 날짜가 바뀌면 오늘을 따라감
+          }
+          if (!busy) render();   // 다운로드 만드는 중이면 끝난 뒤 다시 그려짐
+          checkStale();
+          return;
+        } catch (err) { lastErr = err; }
+      }
+      if (feed) {   // 보여주던 목록은 그대로 두고 실패만 알림
+        $('checkedAt').textContent = '(다시 불러오기 실패 ' + hhmm(new Date()) + ')';
         return;
-      } catch (err) { lastErr = err; }
-    }
-    $('updatedAt').textContent = '불러오기 실패';
-    body.innerHTML = '<tr class="note-row"><td colspan="6">검사건 데이터를 불러오지 못했습니다 (' + esc(lastErr && lastErr.message) + ') — 새로고침을 눌러 다시 시도하세요</td></tr>';
+      }
+      $('updatedAt').textContent = '불러오기 실패';
+      body.innerHTML = '<tr class="note-row"><td colspan="6">검사건 데이터를 불러오지 못했습니다 (' + esc(lastErr && lastErr.message) + ') — 새로고침을 눌러 다시 시도하세요</td></tr>';
+    } finally { loading = false; }
   }
 
+  // 중계 PC 자동 갱신(10분 주기)이 30분 넘게 없으면 경고
+  const STALE_MIN = 30;
+  function checkStale(){
+    const banner = $('staleBanner');
+    const m = feed && String(feed.updated || '').match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})/);
+    if (!m) { banner.hidden = true; return; }
+    const mins = Math.floor((Date.now() - new Date(+m[1], +m[2] - 1, +m[3], +m[4], +m[5]).getTime()) / 60000);
+    if (mins < STALE_MIN) { banner.hidden = true; return; }
+    const ago = mins >= 1440 ? Math.floor(mins / 1440) + '일 ' + Math.floor(mins % 1440 / 60) + '시간'
+      : mins >= 60 ? Math.floor(mins / 60) + '시간 ' + (mins % 60) + '분' : mins + '분';
+    banner.innerHTML = '<span>⚠ 검사건 데이터가 <b>' + ago + '</b> 동안 갱신되지 않았습니다 (마지막 ' + esc(feed.updated) + '). '
+      + '중계 PC의 작업 스케줄러 「검사건리스트 자동갱신」이 멈췄는지 확인하거나, 중계 PC에서 run_autoupdate.bat을 직접 실행하세요.</span>'
+      + '<button type="button" class="mini" data-stale-reload>지금 다시 불러오기</button>';
+    banner.hidden = false;
+  }
+  $('staleBanner').addEventListener('click', e => { if (e.target.closest('[data-stale-reload]')) loadData(true); });
+
   loadData(false);
+  setInterval(() => loadData(true), 5 * 60 * 1000);   // 5분마다 새 데이터 확인
+  setInterval(checkStale, 60 * 1000);                 // 경고 문구의 경과 시간 갱신
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && Date.now() - lastLoad > 60 * 1000) loadData(true);   // 탭으로 돌아오면 확인
+  });
 })();
 </script>
 </body>
